@@ -25,19 +25,14 @@ class Lector(models.Model):
 
 
 class Noticia(models.Model):
-    titol = models.CharField(max_length=20, null=False, default='DEFAULT VALUE')
-    subtitol = models.CharField(max_length=120, null=False, default='DEFAULT VALUE')
+    titol = models.CharField(max_length=60, null=False, default='DEFAULT VALUE')
+    subtitol = models.CharField(max_length=200, null=False, default='DEFAULT VALUE')
     cos = models.CharField(max_length=99999, null=False, default='DEFAULT VALUE')
-    periodista = models.ForeignKey(Periodista, default='', on_delete=models.CASCADE)
+    periodista = models.ForeignKey(Periodista, default='1', on_delete=models.CASCADE)
+    valoracio_mitja = models.DecimalField(max_digits=2, decimal_places=1, default='1')
 
 
 class Valoracio(models.Model):
-    puntuacio = models.IntegerField(
-        default=1,
-        validators=[
-            MaxValueValidator(5),
-            MinValueValidator(1)
-        ]
-    )
-    lector = models.ForeignKey(Noticia, default=1, on_delete=models.CASCADE)
-    noticia = models.ForeignKey(Lector, default='', on_delete=models.CASCADE)
+    puntuacio = models.IntegerField(default='1', validators=[MaxValueValidator(5), MinValueValidator(1)])
+    lector = models.ForeignKey(Noticia, default='1', on_delete=models.CASCADE)
+    noticia = models.ForeignKey(Lector, default='1', on_delete=models.CASCADE)
