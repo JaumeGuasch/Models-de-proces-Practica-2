@@ -11,7 +11,6 @@ class LectorSignUpForm(UserCreationForm):
     last_name = forms.CharField(required=True)
     phone_number = forms.CharField(required=True)
 
-
     class Meta(UserCreationForm.Meta):
         model = User
 
@@ -24,7 +23,7 @@ class LectorSignUpForm(UserCreationForm):
         user.save()
 
         lector = Lector.objects.create(user=user)
-        lector.phone_number =self.cleaned_data.get('phone_number')
+        lector.phone_number = self.cleaned_data.get('phone_number')
         lector.save()
         return lector
 
@@ -45,8 +44,6 @@ class PeriodistaSignUpForm(UserCreationForm):
         user.last_name = self.cleaned_data.get('last_name')
         user.save()
         periodista = Periodista.objects.create(user=user)
-        periodista.phone_number =self.cleaned_data.get('phone_number')
+        periodista.phone_number = self.cleaned_data.get('phone_number')
         periodista.save()
         return periodista
-
-
