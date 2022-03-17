@@ -7,7 +7,6 @@
           crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <title>Notícies</title>
-
 </head>
 <ul>
     {% if user.is_authenticated %}
@@ -42,7 +41,6 @@
                     style="margin-top: 1%;">
             </h6>
         </div>
-
     {% empty %}
         <li>No objects yet.</li>
     {% endfor %}
