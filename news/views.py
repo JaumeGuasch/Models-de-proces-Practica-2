@@ -1,10 +1,14 @@
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.contrib import messages
-from django.views.generic import CreateView
-from .models import User, Lector, Periodista
+from django.views import generic
+from django.views.generic import CreateView, DetailView, ListView
+
+from .models import User, Lector, Periodista, Noticia
 from news.forms import LectorSignUpForm, PeriodistaSignUpForm
+from django.utils import timezone
 
 
 def register(request):
@@ -54,3 +58,8 @@ def login_request(request):
 def logout_view(request):
     logout(request)
     return redirect('/news/register')
+
+
+class NoticiaList(ListView):
+    model = Noticia
+    template_name = 'home.html'
