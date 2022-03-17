@@ -6,3 +6,4 @@ admin.site.register(Lector)
 admin.site.register(Periodista)
 admin.site.register(Noticia)
 admin.site.register(Valoracio)
+
