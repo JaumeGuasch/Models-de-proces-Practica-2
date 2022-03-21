@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import IntegerField, Model
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.forms import ModelForm
 from django.views import generic
 
 
@@ -25,13 +26,23 @@ class Lector(models.Model):
     phone_number = models.CharField(max_length=20, null=False, default='DEFAULT VALUE')
 
 
+CATEGORIA_CHOICES = [
+    (1,'Política'),
+    (2, 'Economia'),
+    (3, 'Social'),
+    (4, 'Esports'),
+    (5, 'Opinió'),
+    (6, 'Successos'),
+]
+
 class Noticia(models.Model):
     titol = models.CharField(max_length=200, null=False, default='DEFAULT VALUE')
     subtitol = models.CharField(max_length=400, null=False, default='DEFAULT VALUE')
     cos = models.CharField(max_length=9999999, null=False, default='DEFAULT VALUE')
+    categoria = models.IntegerField(max_length=999, choices=CATEGORIA_CHOICES, default='Sense categoria')
     periodista = models.ForeignKey(Periodista, default='1', on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
-    valoracio_mitja = models.DecimalField(max_digits=2, decimal_places=1, default='1')
+    valoracio_mitja = models.DecimalField(max_digits=2, decimal_places=1, default='0')
 
     class Meta:
         ordering = ['-created_on']
@@ -44,3 +55,9 @@ class Valoracio(models.Model):
     puntuacio = models.IntegerField(default='1', validators=[MaxValueValidator(5), MinValueValidator(1)])
     lector = models.ForeignKey(Lector, default='1', on_delete=models.CASCADE)
     noticia = models.ForeignKey(Noticia, default='1', on_delete=models.CASCADE)
+
+
+class SubmitNoticia(ModelForm):
+    class meta:
+        model = Noticia
+        fields = ['titol', 'subtitol', 'cos', 'categoria']

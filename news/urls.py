@@ -11,5 +11,5 @@ urlpatterns = [
     path('login/', views.login_request, name='login'),
     path('home/', login_required(NoticiaList.as_view())),  # força l'usuari a estar autenticat
     path('logout/', views.logout_view, name='logout'),
-
+    path('new/', views.crearnoticia, name='new'),
 ]

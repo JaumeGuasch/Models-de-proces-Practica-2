@@ -1,14 +1,11 @@
+from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
-from django.contrib import messages
-from django.views import generic
-from django.views.generic import CreateView, DetailView, ListView
-
-from .models import User, Lector, Periodista, Noticia
-from news.forms import LectorSignUpForm, PeriodistaSignUpForm
-from django.utils import timezone
+from django.views.generic import CreateView, ListView
+from news.forms import LectorSignUpForm, PeriodistaSignUpForm, NoticiaForm
+from .models import User, Noticia
+from django.http import HttpResponseRedirect
 
 
 def register(request):
@@ -63,3 +60,19 @@ def logout_view(request):
 class NoticiaList(ListView):
     model = Noticia
     template_name = 'home.html'
+
+
+def crearnoticia(request):
+    submitted = False
+
+    if request.method == 'POST':
+        form = NoticiaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/news/new?submitted=True')
+    else:
+        form = NoticiaForm
+        if 'submitted' in request.GET:
+            submitted = True
+
+    return render(request, 'new.html', {'form': form, 'submitted': submitted})

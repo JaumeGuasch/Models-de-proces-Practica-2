@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
-from .models import Lector, Periodista
-
+from django.forms import ModelForm
+from .models import Lector, Periodista, Noticia
 from news.models import Lector, Periodista, User
 
 
@@ -47,3 +47,24 @@ class PeriodistaSignUpForm(UserCreationForm):
         periodista.phone_number = self.cleaned_data.get('phone_number')
         periodista.save()
         return periodista
+
+
+# Crear un Noticia form
+class NoticiaForm(ModelForm):
+    class Meta:
+        model = Noticia
+        fields = ('titol', 'subtitol', 'cos', 'categoria')
+
+        labels = {
+            'titol': 'Introdueix el títol de la notícia',
+            'subtitol': 'Introdueix el subtítol de la notícia',
+            'cos': 'Introdueix el cos de la notícia',
+            'categoria':'Selecciona una categoria per a la notícia',
+        }
+
+        widgets = {
+            'titol': forms.TextInput(attrs={'class': 'form-control'}),
+            'subtitol': forms.TextInput(attrs={'class': 'form-control'}),
+            'cos': forms.TextInput(attrs={'class': 'form-control'}),
+            'categoria': forms.Select(attrs={'class': 'form-control'}),
+        }
