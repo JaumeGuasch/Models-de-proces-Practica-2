@@ -4,6 +4,6 @@ Una aplicació que gestiona un blog on usuaris es poden registrar i posteriormen
 
 Realitzada per:
 
-Jaume Guasch Llobera
-Oriol Llobera Isern
+Jaume Guasch Llobera,
+Oriol Llobera Isern,
 Sebastian Bampton Blasco
