@@ -1,13 +1,15 @@
 from django.contrib import messages
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, logout, authenticate, REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import redirect, render
+from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView
 from news.forms import LectorSignUpForm, PeriodistaSignUpForm, CrearNoticia
+from .decorators import lector_required
 from .models import User, Noticia
 
 
@@ -67,34 +69,34 @@ class NoticiaList(LoginRequiredMixin, ListView):
 
 
 ###################################
-class CrearNoticiaView(LoginRequiredMixin,CreateView):
-    login_url = '/news/login/'
-
+class CrearNoticiaView(LoginRequiredMixin, CreateView):
     template_name = 'new.html'
     form_class = CrearNoticia
     success_url = '/news/home/'
 
-    def noticia_new(self, noticia_id):
-        noticia = Noticia.objects.get(pk=noticia_id)
-        return render(self, 'new.html', {'noticia': noticia})
+    @method_decorator(login_required())
+    def periodista_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url='/news/login'):
+        actual_decorator = user_passes_test(
+            lambda u: u.is_active and u.is_periodista,
+            login_url=login_url,
+            redirect_field_name=redirect_field_name
+        )
+        if function:
+            return actual_decorator(function)
+        return actual_decorator
 
     def post(self, request, *args, **kwargs):
-        submitted = False
-        kwargs = {'user': request.user}
-        user_form = CrearNoticia(request.POST or None)
-
-        if not request.user.is_lector:
-            return HttpResponseNotFound('<h1>Page not found</h1>')
-
-        if request.method == 'POST' and request.user.is_periodista:
-            if user_form.is_valid():
-                try:
+        if request.user.is_lector:
+            return HttpResponseRedirect('/news/unauthorized')
+        else:
+            if request.method == 'POST':
+                user_form = CrearNoticia(request.POST)
+                if user_form.is_valid():
                     user_form.instance.created_by = request.user
                     user_form.save()
-                    return HttpResponseRedirect('/news/new?submitted=True')
-                except IntegrityError as err:
-                    print('err =>', err)
-            else:
-                if 'submitted' in request.GET:
-                    submitted = True
-            return render(request, 'new.html', {'form': user_form, 'submitted': submitted})
+                    return HttpResponseRedirect('/news/submitted')
+
+
+
+
+

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <script>
+        let segons = 5;
+
+        function mostrarSegons() {
+            segons -= 1;
+            document.getElementById("secondeddisplay").innerText = "La teva publicació no ha estat admitida per no ser periodista. Seràs redirigit a la secció de notícies en " +segons+ " segons...";
+        }
+
+        setInterval(mostrarSegons, 1000);
+
+        function redirect() {
+            window.location = "/news/home"
+        }
+        setTimeout('redirect()', 5000)
+    </script>
+    <meta charset="UTF-8">
+    <title>Accés no autoritzat</title>
+</head>
+<body>
+
+<div style="text-align: center;">
+    <div id="secondeddisplay"></div>
+    <div>
+        <div class="loading">
+            <img src="https://c.tenor.com/0hjOGLFaQa0AAAAC/lofi-girl-lofi.gif" alt="Carregant">
+        </div>
+    </div>
+</div>
+</body>
+</html>
