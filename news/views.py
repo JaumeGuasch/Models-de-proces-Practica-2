@@ -1,11 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import IntegrityError
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView, ListView
-from news.forms import LectorSignUpForm, PeriodistaSignUpForm, NoticiaForm
+from news.forms import LectorSignUpForm, PeriodistaSignUpForm, CrearNoticia
 from .models import User, Noticia
-from django.http import HttpResponseRedirect
 
 
 def register(request):
@@ -20,7 +23,7 @@ class LectorRegister(CreateView):
     def form_valid(self, form):
         user = form.save()
         login(self.request, user)
-        return redirect('/')
+        return redirect('/news/login')
 
 
 class PeriodistaRegister(CreateView):
@@ -31,7 +34,7 @@ class PeriodistaRegister(CreateView):
     def form_valid(self, form):
         user = form.save()
         login(self.request, user)
-        return redirect('/')
+        return redirect('/news/login')
 
 
 def login_request(request):
@@ -54,25 +57,44 @@ def login_request(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('/news/register')
+    return redirect('/')
 
 
-class NoticiaList(ListView):
+class NoticiaList(LoginRequiredMixin, ListView):
+    login_url = '/news/login/'
     model = Noticia
     template_name = 'home.html'
 
 
-def crearnoticia(request):
-    submitted = False
+###################################
+class CrearNoticiaView(LoginRequiredMixin,CreateView):
+    login_url = '/news/login/'
 
-    if request.method == 'POST':
-        form = NoticiaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/news/new?submitted=True')
-    else:
-        form = NoticiaForm
-        if 'submitted' in request.GET:
-            submitted = True
+    template_name = 'new.html'
+    form_class = CrearNoticia
+    success_url = '/news/home/'
 
-    return render(request, 'new.html', {'form': form, 'submitted': submitted})
+    def noticia_new(self, noticia_id):
+        noticia = Noticia.objects.get(pk=noticia_id)
+        return render(self, 'new.html', {'noticia': noticia})
+
+    def post(self, request, *args, **kwargs):
+        submitted = False
+        kwargs = {'user': request.user}
+        user_form = CrearNoticia(request.POST or None)
+
+        if not request.user.is_lector:
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+
+        if request.method == 'POST' and request.user.is_periodista:
+            if user_form.is_valid():
+                try:
+                    user_form.instance.created_by = request.user
+                    user_form.save()
+                    return HttpResponseRedirect('/news/new?submitted=True')
+                except IntegrityError as err:
+                    print('err =>', err)
+            else:
+                if 'submitted' in request.GET:
+                    submitted = True
+            return render(request, 'new.html', {'form': user_form, 'submitted': submitted})

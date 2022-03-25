@@ -5,6 +5,7 @@ from django.db.models import Model
 from django.forms import ModelForm
 from django.utils import timezone
 
+
 # Create your models here.
 
 class User(AbstractUser):
@@ -27,7 +28,7 @@ class Lector(models.Model):
 
 
 CATEGORIA_CHOICES = [
-    (1,'Política'),
+    (1, 'Política'),
     (2, 'Economia'),
     (3, 'Social'),
     (4, 'Esports'),
@@ -35,12 +36,13 @@ CATEGORIA_CHOICES = [
     (6, 'Successos'),
 ]
 
+
 class Noticia(models.Model):
     titol = models.CharField(max_length=200, null=False, default='DEFAULT VALUE')
     subtitol = models.CharField(max_length=400, null=False, default='DEFAULT VALUE')
     cos = models.CharField(max_length=9999999, null=False, default='DEFAULT VALUE')
     categoria = models.IntegerField(choices=CATEGORIA_CHOICES, default='Sense categoria')
-    periodista = models.ForeignKey(Periodista, default='1', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
     valoracio_mitja = models.DecimalField(max_digits=2, decimal_places=1, default='0')
 

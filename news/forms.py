@@ -4,11 +4,13 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.forms import ModelForm
+from django.views.generic import FormView
+
 from .models import Lector, Periodista, Noticia
 from news.models import Lector, Periodista, User
 
-
 now = timezone.now()
+
 
 class LectorSignUpForm(UserCreationForm):
     first_name = forms.CharField(required=True)
@@ -59,7 +61,7 @@ class PeriodistaSignUpForm(UserCreationForm):
 
 
 # Crear un Noticia form
-class NoticiaForm(ModelForm):
+class CrearNoticia(ModelForm):
     class Meta:
         model = Noticia
         fields = ('titol', 'subtitol', 'cos', 'categoria')
@@ -68,7 +70,7 @@ class NoticiaForm(ModelForm):
             'titol': 'Introdueix el títol de la notícia',
             'subtitol': 'Introdueix el subtítol de la notícia',
             'cos': 'Introdueix el cos de la notícia',
-            'categoria':'Selecciona una categoria per a la notícia',
+            'categoria': 'Selecciona una categoria per a la notícia',
         }
 
         widgets = {
